@@ -1,18 +1,17 @@
-import { rule, repeat, and, or, consume, pick } from "./lib/rules";
+import { or, consume, rule, chain, Rule } from "./rules";
 import { tokens } from "./tokens";
 
-// prettier-ignore
-const seq = rule("Seq",
-  repeat(
-    and(
-      pick(or(
-        consume(tokens.NAME),
-        consume(tokens.SINGLE_QUOTE)
-      )),
-      consume(tokens.SPACE)
-    )
-  ),
-  consume(tokens.EOL)
-)
+const OPERATORS = or("operators", consume(tokens.PLUS, 1));
 
-export const grammar = repeat(seq);
+const BINARY_EXPRESSION: Rule = rule(
+  "BINARY_EXPRESSION",
+  or("left", consume(tokens.NUMBER)),
+  OPERATORS,
+  or(
+    "right",
+    chain(() => BINARY_EXPRESSION),
+    consume(tokens.NUMBER)
+  )
+);
+
+export const grammar = rule("ROOT", or("body", BINARY_EXPRESSION));
