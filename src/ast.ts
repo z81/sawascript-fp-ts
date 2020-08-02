@@ -17,7 +17,11 @@ const parse: any = (node: CSTNode) => {
           ...n,
         }))
       ),
-      O.map((value) => ({ [node.name]: value }))
+      O.map((value) =>
+        node.type === "RULE"
+          ? { kind: node.name, ...value }
+          : { [node.name]: value }
+      )
     );
   }
 

@@ -1,6 +1,7 @@
 import { Eq, getStructEq, eqString } from "@matechs/core/Eq";
 import { pipe } from "@matechs/core/Function";
 import * as O from "@matechs/core/Option";
+import * as A from "@matechs/core/Array";
 
 export type TokenConfig<T extends string> = { regexp: RegExp; type: T };
 
