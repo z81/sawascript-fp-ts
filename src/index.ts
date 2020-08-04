@@ -7,7 +7,7 @@ import { Env, env } from "./environment";
 import { parseAst } from "./ast";
 import { pipe } from "@matechs/core/Function";
 
-const readSources = T.pure("20 + 2 + 2");
+const readSources = T.pure("20 * 2 + 2");
 
 const program: T.AsyncRE<Env, void, any> = Do(T.effect)
   .bind("code", readSources)

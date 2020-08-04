@@ -24,7 +24,7 @@ export const tokenize = (
     T.chain((env) =>
       pipe(
         TOKENS_LIST,
-        A.findFirstMap((token) => matchToken(token, code.substr(offset))),
+        A.findFirstMap(matchToken(code.substr(offset))),
         O.map((tokenInfo) => ({
           ...tokenInfo,
           start: offset,

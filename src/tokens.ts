@@ -11,6 +11,7 @@ const tokensArray = [
   tokenOf({ type: "SPACE", regexp: /^ / }),
   tokenOf({ type: "NUMBER", regexp: /^\d*/ }),
   tokenOf({ type: "PLUS", regexp: /^\+/ }),
+  tokenOf({ type: "MUL", regexp: /^\*/ }),
 ];
 
 export type Token = typeof tokensArray[number];
@@ -28,7 +29,7 @@ export const tokens = Object.fromEntries(
 
 export default tokensArray;
 
-export const matchToken = (token: Token, code: string) =>
+export const matchToken = (code: string) => (token: Token) =>
   pipe(
     O.fromNullable(code.match(token.regexp)?.[0] || null),
     O.map((value) => ({

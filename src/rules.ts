@@ -1,38 +1,52 @@
 import { Token } from "./tokens";
 import { contramap, Ord, ordNumber } from "@matechs/core/Ord";
 
+export enum RuleOutType {
+  Branch,
+  Node,
+}
+
 export const or = <C extends Rule[] | [() => Rule]>(
+  outType: RuleOutType,
   name: string,
-  ...children: C
+  children: C
 ): OrRule => ({
+  outType,
   type: "OR",
   children,
   priority: 0,
   name,
 });
 
-export const and = (name: string, ...children: Rule[]): AndRule => ({
+export const and = (
+  outType: RuleOutType,
+  name: string,
+  children: Rule[]
+): AndRule => ({
   type: "AND",
   children,
   priority: 0,
   name,
+  outType,
 });
 
-export const consume = (token: Token, priority = 0): ConsumeRule => ({
-  type: "CONSUME",
+export const value = (token: Token, priority = 0): ValueRule => ({
+  type: "VALUE",
   token,
   priority,
-  name: "value",
+  name: token.type,
+  outType: RuleOutType.Node,
 });
 
 export const rule = <N extends string>(
   name: N,
-  ...children: Rule[]
+  children: Rule[]
 ): NamedRule => ({
   type: "RULE",
   name,
   children,
   priority: 0,
+  outType: RuleOutType.Node,
 });
 
 export const chain = (rule: () => Rule) => rule as any;
@@ -40,6 +54,7 @@ export const chain = (rule: () => Rule) => rule as any;
 type BaseRule = {
   priority: number;
   name: string;
+  outType: RuleOutType;
 };
 
 export type OrRule = BaseRule & {
@@ -57,9 +72,9 @@ export type AndRule = BaseRule & {
   children: Rule[];
 };
 
-export type ConsumeRule = BaseRule & {
-  type: "CONSUME";
+export type ValueRule = BaseRule & {
+  type: "VALUE";
   token: Token;
 };
 
-export type Rule = ConsumeRule | AndRule | OrRule | NamedRule;
+export type Rule = ValueRule | AndRule | OrRule | NamedRule;

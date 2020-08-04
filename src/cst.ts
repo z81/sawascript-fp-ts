@@ -2,28 +2,35 @@ import { pipe } from "@matechs/core/Function";
 import * as T from "@matechs/core/Effect";
 import * as O from "@matechs/core/Option";
 import * as A from "@matechs/core/Array";
-import { Rule, ConsumeRule, AndRule, OrRule, NamedRule } from "./rules";
+import {
+  Rule,
+  ValueRule,
+  AndRule,
+  OrRule,
+  NamedRule,
+  RuleOutType,
+} from "./rules";
 import { grammar } from "./grammar";
 import { CodeToken, eqToken, Token } from "./tokens";
 import { Env } from "./environment";
 import { Ord, contramap, ordNumber } from "@matechs/core/Ord";
 
-export type CSTNode =
+export type CSTNode = {
+  name: string;
+  outType: RuleOutType;
+  priority: number;
+  type: Rule["type"];
+} & (
   | {
-      name: string;
       token: Token;
       start: number;
       end: number;
-      value: string;
-      priority: number;
-      type: Rule["type"];
+      raw: string;
     }
   | {
-      name: string;
       children: CSTNode[];
-      priority: number;
-      type: Rule["type"];
-    };
+    }
+);
 
 export const cstNodePriority: Ord<CSTNode> = contramap(
   (node: CSTNode) => -node.priority
@@ -78,9 +85,10 @@ const parseRule = (tokens: readonly CodeToken[]) => (
           name: rule.name,
           children,
           priority: rule.priority,
+          outType: rule.outType,
         }))
       );
-    case "CONSUME":
+    case "VALUE":
       return pipe(
         tokens,
         A.head,
@@ -92,6 +100,8 @@ const parseRule = (tokens: readonly CodeToken[]) => (
           name: rule.name,
           priority: rule.priority,
           type: rule.type,
+          outType: rule.outType,
+          raw: tokenInfo.value,
         }))
       );
   }
