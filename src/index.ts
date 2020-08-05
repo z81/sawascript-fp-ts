@@ -7,7 +7,7 @@ import { Env, env } from "./environment";
 import { parseAst } from "./ast";
 import { pipe } from "@matechs/core/Function";
 
-const readSources = T.pure("20 * 2 + 2");
+const readSources = T.pure("1 * 2 + 3 + 4");
 
 const program: T.AsyncRE<Env, void, any> = Do(T.effect)
   .bind("code", readSources)
@@ -17,7 +17,7 @@ const program: T.AsyncRE<Env, void, any> = Do(T.effect)
   .done();
 
 const exitFold = E.fold(
-  (a) => console.log("Result", JSON.stringify(a, null, "  ")),
+  (a) => console.log("Result", a),
   (e) => console.error(e),
   (e) => console.error("Abort", e),
   () => console.error("Interrupt")
