@@ -7,25 +7,8 @@ import * as TR from "@matechs/core/Tree";
 import { of } from "@matechs/core/List";
 import { RuleOutType } from "./rules";
 import { Functor1 } from "fp-ts/lib/Functor";
+import { treeFind, treeFilter } from "./tree";
 
-export const treeFind: <A>(
-  f: (a: A) => boolean
-) => (fa: TR.Tree<A>) => O.Option<TR.Tree<A>> = (f) => (fa) =>
-  pipe(
-    fa.value,
-    O.fromPredicate(f),
-    O.fold(
-      () => pipe(fa.forest, A.findFirstMap(treeFind(f))),
-      () => O.some(fa)
-    )
-  );
-
-export const treeFilter: <A>(
-  f: (a: A) => boolean
-) => (fa: TR.Tree<A>) => TR.Tree<A> = (f) => (fa) => ({
-  value: fa.value,
-  forest: pipe(fa.forest, A.filter(TR.fold(f)), A.map(treeFilter(f))),
-});
 // pipe(
 //   fa.value,
 //   A.chain(() => pipe(fa.forest, A.filter(f), {
@@ -154,37 +137,6 @@ const sortExpression = (node: TR.Tree<CSTNode>): any => {
     ...node,
     forest: node.forest.map(sortExpression),
   };
-
-  // if (node.name === "BINARY_EXPRESSION") {
-  //   return pipe(node.operator);
-  //   //   // const [operator] =
-  //   //   //   node.children.find((n: any) => n.name === "operator")?.children ?? [];
-  //   //   // console.log("oeprator", operator);
-  //   //   // for (const c of node.children) {
-  //   //   //   const [operator2] =
-  //   //   //     c?.children?.[0]?.children?.find((n: any) => n.name === "operator")
-  //   //   //       ?.children ?? [];
-  //   //   //   console.log("operator2", operator2);
-  //   //   //   if (operator2 && operator2?.priority < operator.priority) {
-  //   //   //     console.log("p", node, c);
-  //   //   //     return node;
-  //   //   //     // return {
-  //   //   //     //   ...node,
-  //   //   //     //   children: node.children.map((ch: any) => ({
-  //   //   //     //     ...ch,
-  //   //   //     //     children: ch.children.map((cc: any) => cc.name === "operator" ? )
-  //   //   //     //   })),
-  //   //   //     // };
-  //   //   //   }
-  //   //   // }
-  // }
-
-  // return pipe(
-  //   node,
-  //   Object.entries,
-  //   A.map(([k, v]) => [k, v]),
-  //   Object.fromEntries
-  // );
 };
 
 export const parseAst = (cst: TR.Tree<CSTNode>) =>
@@ -193,12 +145,6 @@ export const parseAst = (cst: TR.Tree<CSTNode>) =>
     O.map(sortExpression),
     O.map((node) => {
       setTimeout(() => {
-        //   // console.log(
-        //   //   TR.reduce("", (t, b) => {
-        //   //     return t + "\n" + (b as any).name;
-        //   //   })(node)
-        //   // );
-
         console.log(
           pipe(
             node,
